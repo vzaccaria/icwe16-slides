@@ -1,0 +1,95 @@
+#+TITLE:     On the Role of Context in the Design of Mobile Mashups 
+#+AUTHOR:    Valerio Cassani, Sefano Gianelli, Riccardo Medana, Maristella Matera, Elisa Quintarelli, Letizia Tanca, Vittorio Zaccaria
+#+INCLUDE:   le_header.org
+
+#+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
+
+* Introduction
+** What is this about?
+
+- *An experiment*: building an app that dynamically collects, integrates and adapts data to the users’ situational needs.
+
+- a.k.a: *CAMUS* (Context-Aware Mobile mashUpS)
+
+
+** Motivation                                                 
+
+Bridging the best of two worlds:
+
+- *Context*: situational model; it allows to  
+  identify pertinent data sources taking into account current users’ needs
+
+- *Mashup*: lightweight integration of heterogeneous data deployed into a mobile app.
+
+* Fundamental concepts
+** Context tree
+
+Design-time representation of the possible situations of use.
+
+
+#+begin_src plantuml :file images/tree.png :exports results :cache yes
+@startuml
+scale 900 width
+title
+|_ **time**
+   |_ morning
+   |_ noon
+   |_ afternoon
+   |_ evening
+   |_ night
+|_ **interest topic**
+   |_ fun 
+   |_ sport 
+   |_ food and drink
+     |_ vegetarian
+     |_ all
+end title
+@enduml
+#+end_src
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :center t :height 5cm
+#+RESULTS[a1564ae7936e05308f3586defa940e46aa89b4f4]:
+[[file:images/tree.png]]
+#+END_CENTER
+
+
+** Primary services
+
+They *fulfill* the original intent of the user. 
+
+#+begin_example
+CONTEXT                           SERVICES
+time = noon,                      veggieapi.com
+interest = food_and_drink    =>   places.com?type=veg
+food_and_drink = vegetarian       thefork?type=veggie 
+#+end_example
+
+** Support services
+
+They provide the user with *additional useful information*
+
+#+begin_example
+CONTEXT                           SERVICES
+time = evening,                   maps.google.com 
+interest = food_and_drink    =>   restaurantreviews.com
+food_and_drink = vegetarian       uber.com
+#+end_example
+
+** Mashup schema
+
+* Architecture
+** Architecture
+** Client/Server Interaction
+* Technologies
+** GraphQL 
+** React Native
+* Case study: Tourism
+** Scenario
+** Context dimension tree
+** Mashup schema 
+** Performance evaluation
+* Live Demo
+* Conclusions
+
+
