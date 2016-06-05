@@ -78,7 +78,7 @@ stop: kill-procs
 
 
 $(BUILDIR)/$(FILEPFX).tex: src/org/$(FILEPFX).org $(BUILDIR)/.f
-	emacs --batch --eval '(progn (find-file "$<") (setq org-confirm-babel-evaluate nil) (org-beamer-export-to-latex nil nil nil t nil))'
+	emacs -u "zaccaria" --batch --eval '(load user-init-file)' $< -f org-beamer-export-to-latex
 	mv src/org/$(FILEPFX).tex $@
 
 
