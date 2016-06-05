@@ -19,7 +19,17 @@ Bridging the best of two worlds:
 - *Context*: situational model; it allows to  
   identify pertinent data sources taking into account current users’ needs
 
-- *Mashup*: lightweight integration of heterogeneous data deployed into a mobile app.
+- *Mashup*: lightweight integration of heterogeneous data deployed into a mobile
+  app.
+
+** Case study: tourism domain
+
+- *Goal*: implement a mobile app for tourists that allows to query useful
+  services based on their interest/intent but still moderated by the tour operator.
+
+- *Other requirements*: the services to be queried and the result mashup is guided by a
+  domain expert
+
 
 * Fundamental concepts
 ** Context tree
@@ -59,6 +69,48 @@ end title
 - $t_u$ will dynamically vary over time but it should be well-formed, i.e., it should have
   at least an interest topic.
 
+** Target run time architecture
+
+Two tier architecture to optimize bandwidth usage.
+
+#+begin_src plantuml :file images/runtime.png :exports results :cache yes
+@startuml
+scale 900 width
+control "External services"
+control "Server"
+actor "End user"
+"End user" -> "Server" : context
+"Server" -> "External services" : requests data
+"External services" -> "Server" : data
+"Server" -> "End user" : mashed-up data
+@enduml
+#+end_src
+
+#+BEGIN_CENTER
+#+RESULTS[520bc35921ab3dd40ecd164e3d760d21bdf1273c]:
+#+ATTR_LATEX: :center t :height 5cm
+[[file:images/runtime.png]]
+#+END_CENTER
+
+** Administrator and domain expert roles
+
+#+begin_src plantuml :file images/designtime.png :exports results :cache yes
+@startuml
+scale 900 width
+actor "Administrator"
+control "Server"
+actor "Domain expert"
+"Administrator" -> "Server" : add service
+"Administrator" -> "Server" : add context model and service assoc
+"Domain expert" -> "Server" : add mashup schema 
+@enduml
+#+end_src
+
+#+BEGIN_CENTER
+#+RESULTS[fd20709dd34f947ebf4e7ef25e9ea60629e45615]:
+#+ATTR_LATEX: :center t :height 5cm
+#+END_CENTER
+
 ** Primary services
 
 They are queried to *fulfill* the original intent of the user ($t_u$). 
@@ -84,6 +136,16 @@ All the possible operations in the system belong to the service repository $O$:
 \begin{equation}
 O = O_{L1} \cup O_{L2} \cup \ldots O_{Ln}
 \end{equation}
+
+** Primary services data mashup
+
+- Each service has its own representation of data which should be made
+  homogeneous before being sent to the client
+
+- Each service-attribute is described by a *term* that allows to individuate
+  semantically similar items.
+
+- Duplicate removal is needed to identify items with similar value of the same term.
 
 ** Principal purpose 
 
@@ -114,6 +176,8 @@ interest = restaurant    =>   restaurantreviews.com
 restaurant = vegetarian       uber.com
 #+end_example
 
+Can be accessed either via *deep-linking* or *web-linking*.
+
 ** Mashup schema
 
 Describes how data should be visualized on the mobile device, 
@@ -126,59 +190,14 @@ interest = restaurant    =>   address: text
 ...                           (long, lat): map 
 #+end_example
 
-* Architecture
-** Run time
+* Implementation 
+** Requirements 
 
-Two tier architecture to optimize bandwidth usage.
+- *Minimize bandwidth usage*: ask only for what you need
 
-#+begin_src plantuml :file images/runtime.png :exports results :cache yes
-@startuml
-scale 900 width
-control "External services"
-control "Server"
-actor "End user"
-"End user" -> "Server" : context
-"Server" -> "External services" : requests data
-"External services" -> "Server" : data
-"Server" -> "End user" : mashed-up data
-@enduml
-#+end_src
+- *Custom response types*: different context may need different types of data
 
-#+BEGIN_CENTER
-#+RESULTS[520bc35921ab3dd40ecd164e3d760d21bdf1273c]:
-#+ATTR_LATEX: :center t :height 5cm
-[[file:images/runtime.png]]
-#+END_CENTER
-
-** Design time
-
-#+begin_src plantuml :file images/designtime.png :exports results :cache yes
-@startuml
-actor "Administrator"
-control "Server"
-actor "Domain expert"
-"Administrator" -> "Server" : add service
-"Administrator" -> "Server" : add context model and service assoc
-"Domain expert" -> "Server" : add mashup schema 
-@enduml
-#+end_src
-
-#+BEGIN_CENTER
-#+RESULTS[fd20709dd34f947ebf4e7ef25e9ea60629e45615]:
-#+ATTR_LATEX: :center t :height 3cm
-[[file:images/designtime.png]]
-#+END_CENTER
-
-* Technologies
-** Requirement n. 1 - flexibility
-*** Minimize bandwidth usage
-Ask only for what you need
-
-*** Custom response types 
-Different context may need different types of data
-
-** Requirement n.2 - native app 
-*** Native app still better performance-wise and battery-wise.
+- *Native app feeling*: native app still better performance-wise and battery-wise.
 
 ** 
 file:./jsatt.jpg 
@@ -187,7 +206,7 @@ file:./jsatt.jpg
 
 - Data-fetching API that returns JSON
 - Query defines a data shape
-  - easy to add field leaving existing clients unaffected.
+  - easy to add field leaving existing clients unaffected
   - optimal bandwidth usage
 - It can be hierarchical: it naturally follows relationships between objects
 
@@ -216,9 +235,9 @@ executeQuery(id: "56975a1bd5704e0d0d815869",
 
 ** React and React Native
 
-- React abstracts away the DOM, giving a simpler programming model and better performance. 
+- React abstracts away the DOM, giving a simpler programming model and better performance 
 
-- It implements one-way reactive data flow which reduces boilerplate and is easier to reason about than traditional data binding.
+- It implements one-way reactive data flow which reduces boilerplate and is easier to reason about than traditional data binding
 
 ** React Native / Example
 
