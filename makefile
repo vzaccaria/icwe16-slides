@@ -11,8 +11,6 @@
 #
 ############################
 
-VPATH = src/esercizi
-INTERMEDIATEDIRS = figures
 CLEANOBJS = book.pdf
 WATCHOBJECT = src/org/book.org
 WATCHTARGET = book.pdf
@@ -68,21 +66,7 @@ kill-procs:
 	$(if $(WATCHOBJECT), pkill -9 -f ".*watchman.*$(WATCHOBJECT)", @echo "WATCHOBJECT not set")
 
 show: show-procs
-
 stop: kill-procs
-
-######################
-#
-# Common build targets
-#
-######################
-
-$(BUILDIR)/%.xelatex.pdf: %.xelatex.tex $(BUILDIR)/.f
-	xelatex $<
-	xelatex $<
-	mv $*.xelatex.pdf $(BUILDIR)
-	rm -f $*.xelatex.aux $*.xelatex.log
-
 
 
 ############################
@@ -91,21 +75,19 @@ $(BUILDIR)/%.xelatex.pdf: %.xelatex.tex $(BUILDIR)/.f
 #
 ############################
 
-tmplts	= $(wildcard src/templates/*.tex)
-
 
 $(BUILDIR)/%.md: %.md $$(@D)/.f
 	exemd $< -p > $@
 
 $(BUILDIR)/container.tex: src/org/book.org $(BUILDIR)/.f
-	emacs --batch --eval '(progn (find-file "$<") (setq org-confirm-babel-evaluate nil) (org-latex-export-to-latex nil nil nil t nil))'
+	emacs --batch --eval '(progn (find-file "$<") (setq org-confirm-babel-evaluate nil) (org-beamer-export-to-latex nil nil nil t nil))'
 	mv src/org/book.tex $@
 
 
 $(BUILDIR)/frontpage.tex: src/frontpage.md
 	pandoc $< -t latex > $@
 
-$(BUILDIR)/book.pdf: $(BUILDIR)/container.tex $(BUILDIR)/frontpage.tex $(tmplts)
+$(BUILDIR)/book.pdf: $(BUILDIR)/container.tex $(BUILDIR)/frontpage.tex
 	mkdir -p $(BUILDIR)/figures
 	mkdir -p $(BUILDIR)/images
 	cp src/images/*.pdf $(BUILDIR)/images
