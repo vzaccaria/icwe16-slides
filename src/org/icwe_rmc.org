@@ -11,7 +11,6 @@
 
 - a.k.a: *CAMUS* (Context-Aware Mobile mashUpS)
 
-
 ** Motivation                                                 
 
 Bridging the best of two worlds:
@@ -31,7 +30,7 @@ Bridging the best of two worlds:
   domain expert
 
 
-* Fundamental concepts
+* Core functionality
 ** Context tree
 
 Design-time representation of the possible situations of use.
@@ -55,7 +54,7 @@ end title
 #+end_src
 
 #+BEGIN_CENTER
-#+ATTR_LATEX: :center t :height 5cm
+#+ATTR_LATEX: :center t :height 4.5cm
 #+RESULTS[a1564ae7936e05308f3586defa940e46aa89b4f4]:
 [[file:images/tree.png]]
 #+END_CENTER
@@ -67,7 +66,16 @@ end title
   $t_u : \mathcal{T}$.
 
 - $t_u$ will dynamically vary over time but it should be well-formed, i.e., it should have
-  at least an interest topic.
+  at least an interest topic, e.g:
+
+- Example of $t_u$:
+  #+begin_example
+  { 
+      interest: "restaurant.veggie", 
+      position: (43.1, 12.1), 
+      time: "noon"
+  } 
+  #+end_example
 
 ** Target run time architecture
 
@@ -79,38 +87,30 @@ scale 900 width
 control "External services"
 control "Server"
 actor "End user"
-"End user" -> "Server" : context
+"Server" -> "End user" : (on login) download mashup schema 
+"End user" -> "Server" : context tree instance
+"Server" -> "Server" : service selection (context tree access)
 "Server" -> "External services" : requests data
 "External services" -> "Server" : data
-"Server" -> "End user" : mashed-up data
+"Server" -> "End user" : mashup data
 @enduml
 #+end_src
 
 #+BEGIN_CENTER
 #+RESULTS[520bc35921ab3dd40ecd164e3d760d21bdf1273c]:
-#+ATTR_LATEX: :center t :height 5cm
-[[file:images/runtime.png]]
+#+ATTR_LATEX: :center t :height 3.5cm
 #+END_CENTER
 
-** Administrator and domain expert roles
+** Principal purpose 
 
-#+begin_src plantuml :file images/designtime.png :exports results :cache yes
-@startuml
-scale 900 width
-actor "Administrator"
-control "Server"
-actor "Domain expert"
-"Administrator" -> "Server" : add service
-"Administrator" -> "Server" : add context model and service assoc
-"Domain expert" -> "Server" : add mashup schema 
-@enduml
-#+end_src
+The *principal purpose* of the system is to provide a way to map $t_u$ to an 
+ordered set of operations needed to satisfy the original goal:
 
-#+BEGIN_CENTER
-#+RESULTS[fd20709dd34f947ebf4e7ef25e9ea60629e45615]:
-#+ATTR_LATEX: :center t :height 5cm
-#+END_CENTER
+\begin{equation}
+\mathcal{C}: \mathcal{T} \rightarrow \mathcal{P}(O)
+\end{equation}
 
+* Service selection, query and data aggregation
 ** Primary services
 
 They are queried to *fulfill* the original intent of the user ($t_u$). 
@@ -147,16 +147,7 @@ O = O_{L1} \cup O_{L2} \cup \ldots O_{Ln}
 
 - Duplicate removal is needed to identify items with similar value of the same term.
 
-** Principal purpose 
-
-The *principal purpose* of the system is to provide a way to map $t_u$ to an 
-ordered set of operations needed to satisfy the original goal:
-
-\begin{equation}
-\mathcal{C}: \mathcal{T} \rightarrow \mathcal{P}(O)
-\end{equation}
-
-** Implementation
+** Service selection
 
 The mapping is done by categorizing leafs parents as:
 
@@ -180,17 +171,23 @@ Can be accessed either via *deep-linking* or *web-linking*.
 
 ** Mashup schema
 
-Describes how data should be visualized on the mobile device, 
-for both *list* and *detail* views.
+- Describes how data should be visualized on the mobile device, for both *list*
+  and *detail* views.
 
-#+begin_example
-CONTEXT                       MASHUP (DETAILS)
-...                           name: text
-interest = restaurant    =>   address: text
-...                           (long, lat): map 
-#+end_example
+- It is downloaded at login and guides the view creation once results are
+  received.
 
-* Implementation 
+- Example:
+
+  #+begin_example
+  CONTEXT                       MASHUP (DETAILS)
+  ...                           name: text
+  interest = restaurant    =>   address: text
+  ...                           (long, lat): map 
+  #+end_example
+
+
+* Client and Server implementation
 ** Requirements 
 
 - *Minimize bandwidth usage*: ask only for what you need
@@ -213,25 +210,25 @@ file:./images/jsatt.jpg
 ** GraphQL example
 
 #+begin_src js 
-executeQuery(id: "56975a1bd5704e0d0d815869",
-    context: [{
-        dimension: "InterestTopic", 
-        value: "Restaurant"
-    }, {
-        dimension: "Position",
-        value: [{
-            name: "lat",
-            value: "41.4"
-        }]
-    }]), {
-    primaryResults {
-        edges {
-            node {title, address, telephone, website}
-            }
-        }
-    }
-}
+executeQuery(id: "56975a1bd5704e0d0d815869", t_u) { shape }
 #+end_src 
+
+where =t_u= is a json-like representation of $t_u$, while 
+*shape* describes the data set needed:
+
+
+#+begin_src js
+  primaryResults {
+      edges {
+          node {
+              title,
+              address,
+              telephone,
+              website
+          }
+      }
+  }
+#+end_src
 
 ** React and React Native
 
@@ -255,7 +252,9 @@ class App extends Component {
 }
 #+end_src
 
+
 * Live Demo
+
 * Performance evaluation
 ** Time breakout 
 
@@ -269,6 +268,7 @@ file:./images/component_time.pdf
 file:./images/exponential_analysis.pdf
 #+end_center
 
+
 * Conclusions
 ** What still needs to be done
 
@@ -277,3 +277,22 @@ file:./images/exponential_analysis.pdf
 - Extension to services with a SOAP interface
 
 
+* Detailed description
+** Administrator and domain expert roles
+
+#+begin_src plantuml :file images/designtime.png :exports results :cache yes
+@startuml
+scale 900 width
+actor "Administrator"
+control "Server"
+actor "Domain expert"
+"Administrator" -> "Server" : add context tree 
+"Administrator" -> "Server" : associate services to CDT nodes
+"Domain expert" -> "Server" : add mashup schema 
+@enduml
+#+end_src
+
+#+BEGIN_CENTER
+#+RESULTS[fd20709dd34f947ebf4e7ef25e9ea60629e45615]:
+#+ATTR_LATEX: :center t :height 5cm
+#+END_CENTER

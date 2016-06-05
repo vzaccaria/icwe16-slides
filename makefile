@@ -76,9 +76,10 @@ stop: kill-procs
 #
 ############################
 
+#emacs -u "zaccaria" --batch --eval '(load user-init-file)' $< -f org-beamer-export-to-latex
 
 $(BUILDIR)/$(FILEPFX).tex: src/org/$(FILEPFX).org $(BUILDIR)/.f
-	emacs -u "zaccaria" --batch --eval '(load user-init-file)' $< -f org-beamer-export-to-latex
+	emacs -u "zaccaria" --batch  $< -f org-beamer-export-to-latex
 	mv src/org/$(FILEPFX).tex $@
 
 
