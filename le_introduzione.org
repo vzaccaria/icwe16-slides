@@ -26,23 +26,20 @@ Bridging the best of two worlds:
 
 Design-time representation of the possible situations of use.
 
-
 #+begin_src plantuml :file images/tree.png :exports results :cache yes
 @startuml
 scale 900 width
 title
-|_ **time**
-   |_ morning
-   |_ noon
-   |_ afternoon
-   |_ evening
-   |_ night
-|_ **interest topic**
-   |_ fun 
-   |_ sport 
-   |_ food and drink
+|_ **time** (enum)
+   |_ morning, noon, afternoon, evening, night
+|_ **interest topic** (enum)
+   |_ fun, sport 
+   |_ restaurant (enum)
      |_ vegetarian
-     |_ all
+     |_ ...
+|_ **position**
+   |_ lat (real)
+   |_ long (real)
 end title
 @enduml
 #+end_src
@@ -53,42 +50,192 @@ end title
 [[file:images/tree.png]]
 #+END_CENTER
 
+** Context tree instance
+
+
+- Given a context tree $\mathcal{T}$, each user $u$ will be characterized by a context tree instance 
+  $t_u : \mathcal{T}$.
+
+- $t_u$ will dynamically vary over time but it should be well-formed, i.e., it should have
+  at least an interest topic.
 
 ** Primary services
 
-They *fulfill* the original intent of the user. 
+They are queried to *fulfill* the original intent of the user ($t_u$). 
 
 #+begin_example
-CONTEXT                           SERVICES
-time = noon,                      veggieapi.com
-interest = food_and_drink    =>   places.com?type=veg
-food_and_drink = vegetarian       thefork?type=veggie 
+CONTEXT                       SERVICES
+time = noon,                  veggieapi.com
+interest = restaurant    =>   places.com?type=veg
+restaurant = vegetarian       thefork?type=veggie 
 #+end_example
 
+** Primary service association
+
+Each enum's leaf $L$ has a set $O_L$ of operations associated with it. Each 
+operation describes a request template to a service $s$. E.g:
+
+\begin{equation}
+O_{\textrm{restaurant.vegetarian}}= \{ o_{\textrm{thefork?type=veggie}}, o_{\textrm{veggieapi}}, \ldots \}
+\end{equation}
+
+All the possible operations in the system belong to the service repository $O$:
+
+\begin{equation}
+O = O_{L1} \cup O_{L2} \cup \ldots O_{Ln}
+\end{equation}
+
+** Principal purpose 
+
+The *principal purpose* of the system is to provide a way to map $t_u$ to an 
+ordered set of operations needed to satisfy the original goal:
+
+\begin{equation}
+\mathcal{C}: \mathcal{T} \rightarrow \mathcal{P}(O)
+\end{equation}
+
+** Implementation
+
+The mapping is done by categorizing leafs parents as:
+
+- *ranking*: leafs value in $t_u$ will influence the order of services in the result (e.g., =position=)
+
+- *filter*: if a leaf is present in $t_u$, it excludes services from all the siblings (e.g, if
+  =vegetarian : restaurant= is present, it excludes all other restaurant types).
+ 
 ** Support services
 
 They provide the user with *additional useful information*
 
 #+begin_example
-CONTEXT                           SERVICES
-time = evening,                   maps.google.com 
-interest = food_and_drink    =>   restaurantreviews.com
-food_and_drink = vegetarian       uber.com
+CONTEXT                       SERVICES
+time = evening,               maps.google.com 
+interest = restaurant    =>   restaurantreviews.com
+restaurant = vegetarian       uber.com
 #+end_example
 
 ** Mashup schema
 
+Describes how data should be visualized on the mobile device, 
+for both *list* and *detail* views.
+
+#+begin_example
+CONTEXT                       MASHUP (DETAILS)
+...                           name: text
+interest = restaurant    =>   address: text
+...                           (long, lat): map 
+#+end_example
+
 * Architecture
-** Architecture
-** Client/Server Interaction
+** Run time
+
+Two tier architecture to optimize bandwidth usage.
+
+#+begin_src plantuml :file images/runtime.png :exports results :cache yes
+@startuml
+scale 900 width
+control "External services"
+control "Server"
+actor "End user"
+"End user" -> "Server" : context
+"Server" -> "External services" : requests data
+"External services" -> "Server" : data
+"Server" -> "End user" : mashed-up data
+@enduml
+#+end_src
+
+#+BEGIN_CENTER
+#+RESULTS[520bc35921ab3dd40ecd164e3d760d21bdf1273c]:
+#+ATTR_LATEX: :center t :height 5cm
+[[file:images/runtime.png]]
+#+END_CENTER
+
+** Design time
+
+#+begin_src plantuml :file images/designtime.png :exports results :cache yes
+@startuml
+actor "Administrator"
+control "Server"
+actor "Domain expert"
+"Administrator" -> "Server" : add service
+"Administrator" -> "Server" : add context model and service assoc
+"Domain expert" -> "Server" : add mashup schema 
+@enduml
+#+end_src
+
+#+BEGIN_CENTER
+#+RESULTS[fd20709dd34f947ebf4e7ef25e9ea60629e45615]:
+#+ATTR_LATEX: :center t :height 3cm
+[[file:images/designtime.png]]
+#+END_CENTER
+
 * Technologies
+** Requirement n. 1 - flexibility
+*** Minimize bandwidth usage
+Ask only for what you need
+
+*** Custom response types 
+Different context may need different types of data
+
+** Requirement n.2 - native app 
+*** Native app still better performance-wise and battery-wise.
+
+** 
+file:./jsatt.jpg 
+
 ** GraphQL 
-** React Native
-* Case study: Tourism
-** Scenario
-** Context dimension tree
-** Mashup schema 
-** Performance evaluation
+
+- Data-fetching API that returns JSON
+- Query defines a data shape
+  - easy to add field leaving existing clients unaffected.
+  - optimal bandwidth usage
+- It can be hierarchical: it naturally follows relationships between objects
+
+** GraphQL example
+
+#+begin_src js 
+executeQuery(id: "56975a1bd5704e0d0d815869",
+    context: [{
+        dimension: "InterestTopic", 
+        value: "Restaurant"
+    }, {
+        dimension: "Position",
+        value: [{
+            name: "lat",
+            value: "41.4"
+        }]
+    }]), {
+    primaryResults {
+        edges {
+            node {title, address, telephone, website}
+            }
+        }
+    }
+}
+#+end_src 
+
+** React and React Native
+
+- React abstracts away the DOM, giving a simpler programming model and better performance. 
+
+- It implements one-way reactive data flow which reduces boilerplate and is easier to reason about than traditional data binding.
+
+** React Native / Example
+
+#+begin_src js
+class App extends Component {
+  render() {
+    return (
+      <TabBarIOS>
+        <TabBarIOS.Item title="React Native" selected={true}>
+          <NavigatorIOS initialRoute={{ title: 'React Native' }} />
+        </TabBarIOS.Item>
+      </TabBarIOS>
+    );
+  }
+}
+#+end_src
+
 * Live Demo
 * Conclusions
 
