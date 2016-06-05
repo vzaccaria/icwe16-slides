@@ -11,9 +11,10 @@
 #
 ############################
 
-CLEANOBJS = book.pdf
-WATCHOBJECT = src/org/book.org
-WATCHTARGET = book.pdf
+FILEPFX = icwe_rmc
+CLEANOBJS = $(FILEPFX).pdf
+WATCHOBJECT = src/org/$(FILEPFX).org
+WATCHTARGET = $(FILEPFX).pdf
 
 ############################
 #
@@ -76,31 +77,23 @@ stop: kill-procs
 ############################
 
 
-$(BUILDIR)/%.md: %.md $$(@D)/.f
-	exemd $< -p > $@
-
-$(BUILDIR)/container.tex: src/org/book.org $(BUILDIR)/.f
+$(BUILDIR)/$(FILEPFX).tex: src/org/$(FILEPFX).org $(BUILDIR)/.f
 	emacs --batch --eval '(progn (find-file "$<") (setq org-confirm-babel-evaluate nil) (org-beamer-export-to-latex nil nil nil t nil))'
-	mv src/org/book.tex $@
+	mv src/org/$(FILEPFX).tex $@
 
 
-$(BUILDIR)/frontpage.tex: src/frontpage.md
-	pandoc $< -t latex > $@
-
-$(BUILDIR)/book.pdf: $(BUILDIR)/container.tex $(BUILDIR)/frontpage.tex
-	mkdir -p $(BUILDIR)/figures
+$(BUILDIR)/$(FILEPFX).pdf: $(BUILDIR)/$(FILEPFX).tex
 	mkdir -p $(BUILDIR)/images
-	cp src/images/*.pdf $(BUILDIR)/images
-	cp $(tmplts) $(BUILDIR)
-	cd $(BUILDIR) && xelatex --shell-escape book.tex | egrep "arning|rror|ages"
-	cd $(BUILDIR) && xelatex --shell-escape book.tex | egrep "arning|rror|ages"
-	cd $(BUILDIR) && xelatex --shell-escape book.tex | egrep "arning|rror|ages"
+	cp src/org/images/* $(BUILDIR)/images
+	cd $(BUILDIR) && xelatex --shell-escape $(FILEPFX).tex | egrep "arning|rror|ages"
+	cd $(BUILDIR) && xelatex --shell-escape $(FILEPFX).tex | egrep "arning|rror|ages"
+	cd $(BUILDIR) && xelatex --shell-escape $(FILEPFX).tex | egrep "arning|rror|ages"
 
-book.pdf: $(BUILDIR)/book.pdf
+$(FILEPFX).pdf: $(BUILDIR)/$(FILEPFX).pdf
 	cp $< $@
 
 edit:
-	open -a "Skim" book.pdf
+	open -a "Skim" $(FILEPFX).pdf
 	make watch
 
-all: book.pdf
+all: $(FILEPFX).pdf
