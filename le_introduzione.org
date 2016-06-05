@@ -200,7 +200,7 @@ interest = restaurant    =>   address: text
 - *Native app feeling*: native app still better performance-wise and battery-wise.
 
 ** 
-file:./jsatt.jpg 
+file:./images/jsatt.jpg 
 
 ** GraphQL 
 
@@ -256,6 +256,24 @@ class App extends Component {
 #+end_src
 
 * Live Demo
+* Performance evaluation
+** Time breakout 
+
+#+begin_center
+file:./images/component_time.pdf
+#+end_center
+
+** Scaling 
+
+#+begin_center
+file:./images/exponential_analysis.pdf
+#+end_center
+
 * Conclusions
+** What still needs to be done
+
+- Better formalization of the query represented by the context
+
+- Extension to services with a SOAP interface
 
 
