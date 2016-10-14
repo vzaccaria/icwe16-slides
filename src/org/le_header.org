@@ -36,8 +36,8 @@
 #+LATEX_HEADER: \setsansfont{Lato}
 #+LATEX_HEADER: \setmonofont[Scale=0.9]{Source Code Pro}
 
-#+LATEX_HEADER: \setbeamerfont{title}     {family=\fontspec{Francois One},shape=\scshape}
-#+LATEX_HEADER: \setbeamerfont{frametitle}{family=\fontspec{Francois One},shape=\scshape}
+#+LATEX_HEADER: \setbeamerfont{title}     {family=\fontspec{Francois One},shape=\scshape,size=\large}
+#+LATEX_HEADER: \setbeamerfont{frametitle}{family=\fontspec{Francois One},shape=\scshape,size=\large}
 
 #+LATEX_HEADER: \newfontfamily\myunicodefallback{Cambria}
 #+LATEX_HEADER: \usepackage{polyglossia}

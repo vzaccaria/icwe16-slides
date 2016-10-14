@@ -1,8 +1,22 @@
 #+TITLE:     On the Role of Context in the Design of Mobile Mashups 
 #+AUTHOR:    Valerio Cassani, Sefano Gianelli, Riccardo Medana, Maristella Matera, Elisa Quintarelli, Letizia Tanca, Vittorio Zaccaria
-#+INCLUDE:   le_header.org
+#+INCLUDE:   le_header_modern.org
 
 #+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
+
+#+BEGIN_SRC emacs-lisp :exports none
+(setq
+     org-latex-image-default-width nil
+     org-latex-pdf-process
+        '("/usr/texbin/lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "/usr/texbin/bibtex %b"
+          "/usr/texbin/lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "/usr/texbin/lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+      )
+#+END_SRC
+
+#+RESULTS:
+| /usr/texbin/lualatex -shell-escape -interaction nonstopmode -output-directory %o %f | /usr/texbin/bibtex %b | /usr/texbin/lualatex -shell-escape -interaction nonstopmode -output-directory %o %f | /usr/texbin/lualatex -shell-escape -interaction nonstopmode -output-directory %o %f |
 
 * Introduction
 ** What is this about?
@@ -29,35 +43,55 @@ Bridging the best of two worlds:
 - *Other requirements*: the services to be queried and the result mashup is guided by a
   domain expert
 
-
 * Core functionality
 ** Context tree
 
 Design-time representation of the possible situations of use.
 
-#+begin_src plantuml :file images/tree.png :exports results :cache yes
-@startuml
-scale 900 width
-title
-|_ **time** (enum)
-   |_ morning, noon, afternoon, evening, night
-|_ **interest topic** (enum)
-   |_ fun, sport 
-   |_ restaurant (enum)
-     |_ vegetarian
-     |_ ...
-|_ **position**
-   |_ lat (real)
-   |_ long (real)
-end title
-@enduml
-#+end_src
+\begin{tikzpicture}[>=stealth,font=\tiny,
+  every node/.style={circle, draw, minimum size=0.75cm},
+  dimension/.style={fill=black, text=white},
+      parameter/.style={thick,double,minimum size=0.25cm}
+]
+\graph [tree layout, grow=down, fresh nodes, level distance=0.5in, sibling distance=0.5in]
+    {
+        r -> {
+          $d_1$ [dimension] -> { $c_{1,1}$, "..." -> $p_{1,2}$ [parameter] , "..."},
+          $d_2$ [dimension] -> { "...", "..." },
+          $d_3$ [dimension] -> { "...", "..." }
+        }
+    };
+\end{tikzpicture}
 
-#+BEGIN_CENTER
-#+ATTR_LATEX: :center t :height 4.5cm
-#+RESULTS[a1564ae7936e05308f3586defa940e46aa89b4f4]:
-[[file:images/tree.png]]
-#+END_CENTER
+where \tikz{\fill[black] (0,0) circle[radius=.5ex]} is called *dimension*, 
+      \tikz{\draw (0,0) circle[radius=.5ex]} is called *concept[fn:1]* and
+      \tikz{\draw[thick,double] (0,0) circle[radius=.5ex]} is called *parameter*.
+
+** Example
+
+\begin{tikzpicture}[>=stealth,font=\tiny,
+  every node/.style={circle, draw, minimum size=0.75cm},
+  dimension/.style={fill=black, text=white},
+      parameter/.style={thick,double,minimum size=0.25cm}
+]
+\graph [tree layout, grow=down, fresh nodes, level distance=0.5in, sibling distance=0.5in]
+    {
+        r -> {
+          time [dimension] -> {morning, noon, evening, night},
+          interest [dimension] -> { 
+                  cinema -> { genre   [dimension] -> {
+                                      thriller, comedy, "..."
+                                      }, 
+                              length [dimension], 
+                              "..." [dimension]
+                            },
+                  food   -> { cuisine [dimension] -> { veggie, "..." } },
+          },
+          position [dimension] -> { lat -> " " [parameter], long -> " " [parameter] }
+        }
+    };
+\end{tikzpicture}
+
 
 ** Context tree instance
 
@@ -81,6 +115,7 @@ end title
 
 Two tier architecture to optimize bandwidth usage.
 
+#+name: e1
 #+begin_src plantuml :file images/runtime.png :exports results :cache yes
 @startuml
 scale 900 width
@@ -97,14 +132,15 @@ actor "End user"
 #+end_src
 
 #+BEGIN_CENTER
-#+RESULTS[520bc35921ab3dd40ecd164e3d760d21bdf1273c]:
-#+ATTR_LATEX: :center t :height 3.5cm
+#+ATTR_LATEX: :center t :height 5cm
+#+RESULTS[3cae167f429329360656a0979a0f95eeeb11b67c]: e1
+[[file:images/runtime.png]]
 #+END_CENTER
 
 ** Principal purpose 
 
 The *principal purpose* of the system is to provide a way to map $t_u$ to an 
-ordered set of operations needed to satisfy the original goal:
+ordered set of queries to services needed to satisfy the original goal:
 
 \begin{equation}
 \mathcal{C}: \mathcal{T} \rightarrow \mathcal{P}(O)
@@ -142,10 +178,10 @@ O = O_{L1} \cup O_{L2} \cup \ldots O_{Ln}
 - Each service has its own representation of data which should be made
   homogeneous before being sent to the client
 
-- Each service-attribute is described by a *term* that allows to individuate
+- Each response field is mapped to a *term* that allows to individuate
   semantically similar items.
 
-- Duplicate removal is needed to identify items with similar value of the same term.
+- Reconciliation and duplicate removal is used to remove duplicate items.
 
 ** Service selection
 
@@ -185,7 +221,6 @@ Can be accessed either via *deep-linking* or *web-linking*.
   interest = restaurant    =>   address: text
   ...                           (long, lat): map 
   #+end_example
-
 
 * Client and Server implementation
 ** Requirements 
@@ -252,7 +287,6 @@ class App extends Component {
 }
 #+end_src
 
-
 * Live Demo
 
 * Performance evaluation
@@ -267,7 +301,6 @@ file:./images/component_time.pdf
 #+begin_center
 file:./images/exponential_analysis.pdf
 #+end_center
-
 
 * Conclusions
 ** What still needs to be done
@@ -296,3 +329,7 @@ actor "Domain expert"
 #+RESULTS[fd20709dd34f947ebf4e7ef25e9ea60629e45615]:
 #+ATTR_LATEX: :center t :height 5cm
 #+END_CENTER
+
+* Footnotes
+
+[fn:1] Except the root.

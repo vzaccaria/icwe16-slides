@@ -1,19 +1,8 @@
-% Created 2016-06-05 Sun 22:24
+% Created 2016-10-14 Fri 19:23
 \documentclass[smaller]{beamer}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{fixltx2e}
-\usepackage{graphicx}
-\usepackage{grffile}
-\usepackage{longtable}
-\usepackage{wrapfig}
-\usepackage{rotating}
-\usepackage[normalem]{ulem}
-\usepackage{amsmath}
-\usepackage{textcomp}
-\usepackage{amssymb}
-\usepackage{capt-of}
-\usepackage{hyperref}
+
+
+\usetheme{metropolis}
 \usepackage{fixltx2e}
 \usepackage{graphicx}
 \usepackage{longtable}
@@ -28,35 +17,31 @@
 \usepackage{amssymb}
 \usepackage{hyperref}
 \tolerance=1000
+\usepackage{shellesc}
 \usepackage{minted}
-\usepackage{fontspec,xltxtra,xunicode}
-\setmainfont{Lato}
-\setsansfont{Lato}
-\setmonofont[Scale=0.9]{Source Code Pro}
-\setbeamerfont{title}     {family=\fontspec{Francois One},shape=\scshape}
-\setbeamerfont{frametitle}{family=\fontspec{Francois One},shape=\scshape}
-\newfontfamily\myunicodefallback{Cambria}
+\usepackage{fontspec,xunicode,xltxtra}
+\usepackage{tikz}
+\usetikzlibrary{graphdrawing}
+\usetikzlibrary{graphs}
+\usegdlibrary{trees}
+\setmonofont[Scale=0.7]{Menlo}
 \usepackage{polyglossia}
-\setmainlanguage{italiano}
-\usepackage[Arrows]{ucharclasses}
-\setTransitionsForSymbols{\begingroup\myunicodefallback}{\endgroup}
-\AtBeginSection[]{\begin{frame}<beamer>\frametitle{Outline}\tableofcontents[currentsection]\end{frame}}
-\linespread{1.2}
-\definecolor{links}{HTML}{0086F7}
-\hypersetup{colorlinks,linkcolor=,urlcolor=links}
-\setbeamertemplate{frametitle}[default][center]
+\setmainlanguage{italian}
+\newfontfamily\myunicodefallback{Menlo}
 \newcommand{\keyboard}{{\color{red}\vspace{0.5cm}\fontspec[Scale=0.5]{Fira Sans SemiBold}INPUT}}
 \newcommand{\screen}{{\color{blue}\vspace{0.5cm}\fontspec[Scale=0.5]{Fira Sans SemiBold}OUTPUT}\vspace{-0.2cm}}
-\usetheme{Dresden}
-\author{Valerio Cassani, Sefano Gianelli, Riccardo Medana, Maristella Matera, Elisa Quintarelli, Letizia Tanca, Vittorio Zaccaria}
+\usepackage{fancyvrb}
+\usetheme{default}
+\author{Valerio Cassani, Sefano Gianelli, Riccardo Medana, Maristella Matera, Elisa Quintarelli, Letizia Tanca, Vittorio Zaccaria Vittorio Zaccaria}
 \date{\today}
 \title{On the Role of Context in the Design of Mobile Mashups}
+\AtBeginSection[]{\begin{frame}[noframenumbering,plain]{Outline}\tableofcontents[currentsection]\end{frame}}
 \hypersetup{
- pdfauthor={Valerio Cassani, Sefano Gianelli, Riccardo Medana, Maristella Matera, Elisa Quintarelli, Letizia Tanca, Vittorio Zaccaria},
+ pdfauthor={Valerio Cassani, Sefano Gianelli, Riccardo Medana, Maristella Matera, Elisa Quintarelli, Letizia Tanca, Vittorio Zaccaria Vittorio Zaccaria},
  pdftitle={On the Role of Context in the Design of Mobile Mashups},
  pdfkeywords={},
  pdfsubject={},
- pdfcreator={Emacs 24.5.1 (Org mode 8.3.4)}, 
+ pdfcreator={Emacs 24.5.1 (Org mode 8.3.6)}, 
  pdflang={Italian}}
 \begin{document}
 
@@ -98,18 +83,58 @@ domain expert
 \end{itemize}
 \end{frame}
 
-
 \section{Core functionality}
-\label{sec:orgheadline9}
+\label{sec:orgheadline10}
 \begin{frame}[label={sec:orgheadline5}]{Context tree}
 Design-time representation of the possible situations of use.
 
-\begin{center}
-\includegraphics[height=4.5cm]{images/tree.png}
-\end{center}
+\begin{tikzpicture}[>=stealth,font=\tiny,
+  every node/.style={circle, draw, minimum size=0.75cm},
+  dimension/.style={fill=black, text=white},
+      parameter/.style={thick,double,minimum size=0.25cm}
+]
+\graph [tree layout, grow=down, fresh nodes, level distance=0.5in, sibling distance=0.5in]
+    {
+        r -> {
+          $d_1$ [dimension] -> { $c_{1,1}$, "..." -> $p_{1,2}$ [parameter] , "..."},
+          $d_2$ [dimension] -> { "...", "..." },
+          $d_3$ [dimension] -> { "...", "..." }
+        }
+    };
+\end{tikzpicture}
+
+where \tikz{\fill[black] (0,0) circle[radius=.5ex]} is called \alert{dimension}, 
+      \tikz{\draw (0,0) circle[radius=.5ex]} is called \alert{concept\footnote{Except the root.}} and
+      \tikz{\draw[thick,double] (0,0) circle[radius=.5ex]} is called \alert{parameter}.
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgheadline6}]{Context tree instance}
+\begin{frame}[label={sec:orgheadline6}]{Example}
+\begin{tikzpicture}[>=stealth,font=\tiny,
+  every node/.style={circle, draw, minimum size=0.75cm},
+  dimension/.style={fill=black, text=white},
+      parameter/.style={thick,double,minimum size=0.25cm}
+]
+\graph [tree layout, grow=down, fresh nodes, level distance=0.5in, sibling distance=0.5in]
+    {
+        r -> {
+          time [dimension] -> {morning, noon, evening, night},
+          interest [dimension] -> { 
+                  cinema -> { genre   [dimension] -> {
+                                      thriller, comedy, "..."
+                                      }, 
+                              length [dimension], 
+                              "..." [dimension]
+                            },
+                  food   -> { cuisine [dimension] -> { veggie, "..." } },
+          },
+          position [dimension] -> { lat -> " " [parameter], long -> " " [parameter] }
+        }
+    };
+\end{tikzpicture}
+\end{frame}
+
+
+\begin{frame}[fragile,label={sec:orgheadline7}]{Context tree instance}
  \begin{itemize}
 \item Given a context tree \(\mathcal{T}\), each user \(u\) will be characterized by a context tree instance 
 \(t_u : \mathcal{T}\).
@@ -128,17 +153,17 @@ at least an interest topic, e.g:
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgheadline7}]{Target run time architecture}
+\begin{frame}[label={sec:orgheadline8}]{Target run time architecture}
 Two tier architecture to optimize bandwidth usage.
 
 \begin{center}
-\includegraphics[width=.9\linewidth]{images/runtime.png}
+\includegraphics[height=5cm]{images/runtime.png}
 \end{center}
 \end{frame}
 
-\begin{frame}[label={sec:orgheadline8}]{Principal purpose}
+\begin{frame}[label={sec:orgheadline9}]{Principal purpose}
 The \alert{principal purpose} of the system is to provide a way to map \(t_u\) to an 
-ordered set of operations needed to satisfy the original goal:
+ordered set of queries to services needed to satisfy the original goal:
 
 \begin{equation}
 \mathcal{C}: \mathcal{T} \rightarrow \mathcal{P}(O)
@@ -146,8 +171,8 @@ ordered set of operations needed to satisfy the original goal:
 \end{frame}
 
 \section{Service selection, query and data aggregation}
-\label{sec:orgheadline16}
-\begin{frame}[fragile,label={sec:orgheadline10}]{Primary services}
+\label{sec:orgheadline17}
+\begin{frame}[fragile,label={sec:orgheadline11}]{Primary services}
  They are queried to \alert{fulfill} the original intent of the user (\(t_u\)). 
 
 \begin{verbatim}
@@ -158,7 +183,7 @@ restaurant = vegetarian       thefork?type=veggie
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[label={sec:orgheadline11}]{Primary service association}
+\begin{frame}[label={sec:orgheadline12}]{Primary service association}
 Each enum's leaf \(L\) has a set \(O_L\) of operations associated with it. Each 
 operation describes a request template to a service \(s\). E.g:
 
@@ -173,19 +198,19 @@ O = O_{L1} \cup O_{L2} \cup \ldots O_{Ln}
 \end{equation}
 \end{frame}
 
-\begin{frame}[label={sec:orgheadline12}]{Primary services data mashup}
+\begin{frame}[label={sec:orgheadline13}]{Primary services data mashup}
 \begin{itemize}
 \item Each service has its own representation of data which should be made
 homogeneous before being sent to the client
 
-\item Each service-attribute is described by a \alert{term} that allows to individuate
+\item Each response field is mapped to a \alert{term} that allows to individuate
 semantically similar items.
 
-\item Duplicate removal is needed to identify items with similar value of the same term.
+\item Reconciliation and duplicate removal is used to remove duplicate items.
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgheadline13}]{Service selection}
+\begin{frame}[fragile,label={sec:orgheadline14}]{Service selection}
  The mapping is done by categorizing leafs parents as:
 
 \begin{itemize}
@@ -196,7 +221,7 @@ semantically similar items.
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgheadline14}]{Support services}
+\begin{frame}[fragile,label={sec:orgheadline15}]{Support services}
  They provide the user with \alert{additional useful information}
 
 \begin{verbatim}
@@ -209,7 +234,7 @@ restaurant = vegetarian       uber.com
 Can be accessed either via \alert{deep-linking} or \alert{web-linking}.
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgheadline15}]{Mashup schema}
+\begin{frame}[fragile,label={sec:orgheadline16}]{Mashup schema}
  \begin{itemize}
 \item Describes how data should be visualized on the mobile device, for both \alert{list}
   and \alert{detail} views.
@@ -228,10 +253,9 @@ interest = restaurant    =>   address: text
 \end{itemize}
 \end{frame}
 
-
 \section{Client and Server implementation}
-\label{sec:orgheadline23}
-\begin{frame}[label={sec:orgheadline17}]{Requirements}
+\label{sec:orgheadline24}
+\begin{frame}[label={sec:orgheadline18}]{Requirements}
 \begin{itemize}
 \item \alert{Minimize bandwidth usage}: ask only for what you need
 
@@ -241,11 +265,11 @@ interest = restaurant    =>   address: text
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgheadline18}]{}
-\includegraphics[width=.9\linewidth]{./images/jsatt.jpg} 
+\begin{frame}[label={sec:orgheadline19}]{}
+\includegraphics{./images/jsatt.jpg} 
 \end{frame}
 
-\begin{frame}[label={sec:orgheadline19}]{GraphQL}
+\begin{frame}[label={sec:orgheadline20}]{GraphQL}
 \begin{itemize}
 \item Data-fetching API that returns JSON
 \item Query defines a data shape
@@ -257,7 +281,7 @@ interest = restaurant    =>   address: text
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgheadline20}]{GraphQL example}
+\begin{frame}[fragile,label={sec:orgheadline21}]{GraphQL example}
  \begin{minted}[obeytabs=true,baselinestretch=0.95]{js}
 executeQuery(id: "56975a1bd5704e0d0d815869", t_u) { shape }
 \end{minted}
@@ -280,7 +304,7 @@ primaryResults {
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:orgheadline21}]{React and React Native}
+\begin{frame}[label={sec:orgheadline22}]{React and React Native}
 \begin{itemize}
 \item React abstracts away the DOM, giving a simpler programming model and better performance
 
@@ -288,7 +312,7 @@ primaryResults {
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgheadline22}]{React Native / Example}
+\begin{frame}[fragile,label={sec:orgheadline23}]{React Native / Example}
  \begin{minted}[obeytabs=true,baselinestretch=0.95]{js}
 class App extends Component {
   render() {
@@ -304,28 +328,26 @@ class App extends Component {
 \end{minted}
 \end{frame}
 
-
 \section{Live Demo}
-\label{sec:orgheadline24}
+\label{sec:orgheadline25}
 
 \section{Performance evaluation}
-\label{sec:orgheadline27}
-\begin{frame}[label={sec:orgheadline25}]{Time breakout}
+\label{sec:orgheadline28}
+\begin{frame}[label={sec:orgheadline26}]{Time breakout}
 \begin{center}
-\includegraphics[width=.9\linewidth]{./images/component_time.pdf}
+\includegraphics{./images/component_time.pdf}
 \end{center}
 \end{frame}
 
-\begin{frame}[label={sec:orgheadline26}]{Scaling}
+\begin{frame}[label={sec:orgheadline27}]{Scaling}
 \begin{center}
-\includegraphics[width=.9\linewidth]{./images/exponential_analysis.pdf}
+\includegraphics{./images/exponential_analysis.pdf}
 \end{center}
 \end{frame}
-
 
 \section{Conclusions}
-\label{sec:orgheadline29}
-\begin{frame}[label={sec:orgheadline28}]{What still needs to be done}
+\label{sec:orgheadline30}
+\begin{frame}[label={sec:orgheadline29}]{What still needs to be done}
 \begin{itemize}
 \item Better formalization of the query represented by the context
 
@@ -335,10 +357,10 @@ class App extends Component {
 
 
 \section{Detailed description}
-\label{sec:orgheadline31}
-\begin{frame}[label={sec:orgheadline30}]{Administrator and domain expert roles}
+\label{sec:orgheadline32}
+\begin{frame}[label={sec:orgheadline31}]{Administrator and domain expert roles}
 \begin{center}
-\includegraphics[width=.9\linewidth]{images/designtime.png}
+\includegraphics{images/designtime.png}
 \end{center}
 \end{frame}
 \end{document}

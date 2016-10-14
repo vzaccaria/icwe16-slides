@@ -1,0 +1,85 @@
+
+#+AUTHOR:    Vittorio Zaccaria
+#+EMAIL:     vittorio.zaccaria@polimi.it
+#+KEYWORDS:
+#+DESCRIPTION:
+#+LANGUAGE:  it
+
+
+#+startup: BEAMER
+#+LaTeX_CLASS:         beamer
+#+LaTeX_CLASS_OPTIONS: [smaller]
+
+
+#+OPTIONS:   H:2 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t ':t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+#+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
+
+#+LATEX_HEADER: \usetheme{metropolis}
+#+LaTeX_HEADER: \usepackage{fixltx2e}
+#+LaTeX_HEADER: \usepackage{graphicx}
+#+LaTeX_HEADER: \usepackage{longtable}
+#+LaTeX_HEADER: \usepackage{float}
+#+LaTeX_HEADER: \usepackage{wrapfig}
+#+LaTeX_HEADER: \usepackage{rotating}
+#+LaTeX_HEADER: \usepackage[normalem]{ulem}
+#+LaTeX_HEADER: \usepackage{amsmath}
+#+LaTeX_HEADER: \usepackage{textcomp}
+#+LaTeX_HEADER: \usepackage{marvosym}
+#+LaTeX_HEADER: \usepackage{wasysym}
+#+LaTeX_HEADER: \usepackage{amssymb}
+#+LaTeX_HEADER: \usepackage{hyperref}
+
+#+LaTeX_HEADER: \tolerance=1000
+#+LaTeX_HEADER: \usepackage{shellesc}
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usepackage{fontspec,xunicode,xltxtra}
+#+LaTeX_HEADER: \usepackage{tikz}
+#+LaTeX_HEADER: \usetikzlibrary{graphdrawing}
+#+LaTeX_HEADER: \usetikzlibrary{graphs}
+#+LaTeX_HEADER: \usegdlibrary{trees}
+
+
+# #+LATEX_HEADER: \setmainfont{Lato}
+# #+LATEX_HEADER: \setsansfont{Lato}
+#+LATEX_HEADER: \setmonofont[Scale=0.7]{Menlo}
+
+
+# Just for the accents
+#+LATEX_HEADER: \usepackage{polyglossia}
+#+LATEX_HEADER: \setmainlanguage{italian}
+
+#+LATEX_HEADER: \newfontfamily\myunicodefallback{Menlo}
+
+# #+LATEX_HEADER: \definecolor{links}{HTML}{0086F7}
+# #+LATEX_HEADER: \hypersetup{colorlinks,linkcolor=,urlcolor=links}
+# #+LATEX_HEADER: \setbeamertemplate{frametitle}[default][center]
+
+# #+LATEX_HEADER: \setbeamerfont{frametitle}{family=\fontspec{Francois One},shape=\scshape}
+# #+LATEX_HEADER: \setbeamerfont{title}     {family=\fontspec{Francois One},shape=\scshape,size={\fontsize{32}{36}}}
+
+#+LATEX_HEADER: \newcommand{\keyboard}{{\color{red}\vspace{0.5cm}\fontspec[Scale=0.5]{Fira Sans SemiBold}INPUT}}
+#+LATEX_HEADER: \newcommand{\screen}{{\color{blue}\vspace{0.5cm}\fontspec[Scale=0.5]{Fira Sans SemiBold}OUTPUT}\vspace{-0.2cm}}
+
+# #+BEAMER_THEME: Dresden
+
+#+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
+
+
+#+BEAMER_HEADER: \AtBeginSection[]{\begin{frame}[noframenumbering,plain]{Outline}\tableofcontents[currentsection]\end{frame}}
+
+# #+begin_src emacs-lisp :exports none :results silent
+# (setq org-latex-minted-options
+#    '(
+#    ("baselinestretch" "0.85")
+#      )
+# )
+# #+end_src
+
+#+LaTeX_HEADER: \usepackage{fancyvrb}
+# #+LATEX_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{baselinestretch=0.0}
+
