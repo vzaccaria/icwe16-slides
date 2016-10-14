@@ -6,7 +6,6 @@
 
 #+BEGIN_SRC emacs-lisp :exports none
 (setq
-     org-latex-image-default-width nil
      org-latex-pdf-process
         '("/usr/texbin/lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
           "/usr/texbin/bibtex %b"
