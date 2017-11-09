@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8"/>
+<title>On the Role of Context in the Design of Mobile Mashups</title>
+<meta name="author" content="(Valerio Cassani, Sefano Gianelli, Riccardo Medana, Maristella Matera, Elisa Quintarelli, Letizia Tanca, Vittorio Zaccaria Vittorio Zaccaria)"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/moon.css" id="theme"/>
+
+
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'http://cdn.jsdelivr.net/reveal.js/3.0.0/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section id="sec-title-slide"><h1 class="title">On the Role of Context in the Design of Mobile Mashups</h1><h2 class="author">Valerio Cassani, Sefano Gianelli, Riccardo Medana, Maristella Matera, Elisa Quintarelli, Letizia Tanca, Vittorio Zaccaria Vittorio Zaccaria</h2><p class="date">Created: 2016-10-23 Sun 22:53</p>
+</section>
+<section id="table-of-contents">
+<div id="table-of-contents">
+<h2>Indice</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#/slide-orgheadline4">1. Introduction</a>
+<ul>
+<li><a href="#/slide-orgheadline1">1.1. What is this about?</a></li>
+<li><a href="#/slide-orgheadline2">1.2. Motivation</a></li>
+<li><a href="#/slide-orgheadline3">1.3. Case study: tourism domain</a></li>
+</ul>
+</li>
+<li><a href="#/slide-orgheadline10">2. Core functionality</a>
+<ul>
+<li><a href="#/slide-orgheadline5">2.1. Context tree</a></li>
+<li><a href="#/slide-orgheadline6">2.2. Example</a></li>
+<li><a href="#/slide-orgheadline7">2.3. Context tree instance</a></li>
+<li><a href="#/slide-orgheadline8">2.4. Target run time architecture</a></li>
+<li><a href="#/slide-orgheadline9">2.5. Principal purpose</a></li>
+</ul>
+</li>
+<li><a href="#/slide-orgheadline17">3. Service selection, query and data aggregation</a>
+<ul>
+<li><a href="#/slide-orgheadline11">3.1. Primary services</a></li>
+<li><a href="#/slide-orgheadline12">3.2. Primary service association</a></li>
+<li><a href="#/slide-orgheadline13">3.3. Primary services data mashup</a></li>
+<li><a href="#/slide-orgheadline14">3.4. Service selection</a></li>
+<li><a href="#/slide-orgheadline15">3.5. Support services</a></li>
+<li><a href="#/slide-orgheadline16">3.6. Mashup schema</a></li>
+</ul>
+</li>
+<li><a href="#/slide-orgheadline24">4. Client and Server implementation</a>
+<ul>
+<li><a href="#/slide-orgheadline18">4.1. Requirements</a></li>
+<li><a href="#/slide-orgheadline19">4.2. </a></li>
+<li><a href="#/slide-orgheadline20">4.3. GraphQL</a></li>
+<li><a href="#/slide-orgheadline21">4.4. GraphQL example</a></li>
+<li><a href="#/slide-orgheadline22">4.5. React and React Native</a></li>
+<li><a href="#/slide-orgheadline23">4.6. React Native / Example</a></li>
+</ul>
+</li>
+<li><a href="#/slide-orgheadline25">5. Live Demo</a></li>
+<li><a href="#/slide-orgheadline28">6. Performance evaluation</a>
+<ul>
+<li><a href="#/slide-orgheadline26">6.1. Time breakout</a></li>
+<li><a href="#/slide-orgheadline27">6.2. Scaling</a></li>
+</ul>
+</li>
+<li><a href="#/slide-orgheadline30">7. Conclusions</a>
+<ul>
+<li><a href="#/slide-orgheadline29">7.1. What still needs to be done</a></li>
+</ul>
+</li>
+<li><a href="#/slide-orgheadline32">8. Detailed description</a>
+<ul>
+<li><a href="#/slide-orgheadline31">8.1. Administrator and domain expert roles</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section>
+<section id="slide-orgheadline4">
+<h2 id="orgheadline4"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+</div></section>
+<section id="slide-orgheadline1">
+<h3 id="orgheadline1"><span class="section-number-3">1.1</span> What is this about?</h3>
+<ul>
+<li><b>An experiment</b>: building an app that dynamically collects, integrates and adapts data to the users’ situational needs.</li>
+
+<li>a.k.a: <b>CAMUS</b> (Context-Aware Mobile mashUpS)</li>
+
+</ul>
+
+</section>
+<section id="slide-orgheadline2">
+<h3 id="orgheadline2"><span class="section-number-3">1.2</span> Motivation</h3>
+<p>
+Bridging the best of two worlds:
+</p>
+
+<ul>
+<li><b>Context</b>: situational model; it allows to  
+identify pertinent data sources taking into account current users’ needs</li>
+
+<li><b>Mashup</b>: lightweight integration of heterogeneous data deployed into a mobile
+app.</li>
+
+</ul>
+
+</section>
+<section id="slide-orgheadline3">
+<h3 id="orgheadline3"><span class="section-number-3">1.3</span> Case study: tourism domain</h3>
+<ul>
+<li><b>Goal</b>: implement a mobile app for tourists that allows to query useful
+services based on their interest/intent but still moderated by the tour operator.</li>
+
+<li><b>Other requirements</b>: the services to be queried and the result mashup is guided by a
+domain expert</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-orgheadline10">
+<h2 id="orgheadline10"><span class="section-number-2">2</span> Core functionality</h2>
+<div class="outline-text-2" id="text-2">
+</div></section>
+<section id="slide-orgheadline5">
+<h3 id="orgheadline5"><span class="section-number-3">2.1</span> Context tree</h3>
+<p>
+Design-time representation of the possible situations of use.
+</p>
+
+<div>
+\begin{tikzpicture}[>=stealth,font=\tiny,
+  every node/.style={circle, draw, minimum size=0.75cm},
+  dimension/.style={fill=black, text=white},
+      parameter/.style={thick,double,minimum size=0.25cm}
+]
+\graph [tree layout, grow=down, fresh nodes, level distance=0.5in, sibling distance=0.5in]
+    {
+        r -> {
+          $d_1$ [dimension] -> { $c_{1,1}$, "..." -> $p_{1,2}$ [parameter] , "..."},
+          $d_2$ [dimension] -> { "...", "..." },
+          $d_3$ [dimension] -> { "...", "..." }
+        }
+    };
+\end{tikzpicture}
+
+</div>
+
+<p>
+where \tikz{\fill[black] (0,0) circle[radius=.5ex]} is called <b>dimension</b>, 
+      \tikz{\draw (0,0) circle[radius=.5ex]} is called <b>concept<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup></b> and
+      \tikz{\draw[thick,double] (0,0) circle[radius=.5ex]} is called <b>parameter</b>.
+</p>
+
+</section>
+<section id="slide-orgheadline6">
+<h3 id="orgheadline6"><span class="section-number-3">2.2</span> Example</h3>
+<div>
+\begin{tikzpicture}[>=stealth,font=\tiny,
+  every node/.style={circle, draw, minimum size=0.75cm},
+  dimension/.style={fill=black, text=white},
+      parameter/.style={thick,double,minimum size=0.25cm}
+]
+\graph [tree layout, grow=down, fresh nodes, level distance=0.5in, sibling distance=0.5in]
+    {
+        r -> {
+          time [dimension] -> {morning, noon, evening, night},
+          interest [dimension] -> { 
+                  cinema -> { genre   [dimension] -> {
+                                      thriller, comedy, "..."
+                                      }, 
+                              length [dimension], 
+                              "..." [dimension]
+                            },
+                  food   -> { cuisine [dimension] -> { veggie, "..." } },
+          },
+          position [dimension] -> { lat -> " " [parameter], long -> " " [parameter] }
+        }
+    };
+\end{tikzpicture}
+
+</div>
+
+
+</section>
+<section id="slide-orgheadline7">
+<h3 id="orgheadline7"><span class="section-number-3">2.3</span> Context tree instance</h3>
+<ul>
+<li>Given a context tree \(\mathcal{T}\), each user \(u\) will be characterized by a context tree instance 
+\(t_u : \mathcal{T}\).</li>
+
+<li>\(t_u\) will dynamically vary over time but it should be well-formed, i.e., it should have
+at least an interest topic, e.g:</li>
+
+<li><p>
+Example of \(t_u\):
+</p>
+<pre class="example">
+{ 
+    interest: "restaurant.veggie", 
+    position: (43.1, 12.1), 
+    time: "noon"
+}
+</pre></li>
+
+</ul>
+
+</section>
+<section id="slide-orgheadline8">
+<h3 id="orgheadline8"><span class="section-number-3">2.4</span> Target run time architecture</h3>
+<p>
+Two tier architecture to optimize bandwidth usage.
+</p>
+
+<div class="org-center">
+
+<div class="figure">
+<p><img src="images/runtime.png" alt="runtime.png" />
+</p>
+</div>
+</div>
+
+</section>
+<section id="slide-orgheadline9">
+<h3 id="orgheadline9"><span class="section-number-3">2.5</span> Principal purpose</h3>
+<p>
+The <b>principal purpose</b> of the system is to provide a way to map \(t_u\) to an 
+ordered set of queries to services needed to satisfy the original goal:
+</p>
+
+<div>
+\begin{equation}
+\mathcal{C}: \mathcal{T} \rightarrow \mathcal{P}(O)
+\end{equation}
+
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-orgheadline17">
+<h2 id="orgheadline17"><span class="section-number-2">3</span> Service selection, query and data aggregation</h2>
+<div class="outline-text-2" id="text-3">
+</div></section>
+<section id="slide-orgheadline11">
+<h3 id="orgheadline11"><span class="section-number-3">3.1</span> Primary services</h3>
+<p>
+They are queried to <b>fulfill</b> the original intent of the user (\(t_u\)). 
+</p>
+
+<pre class="example">
+CONTEXT                       SERVICES
+time = noon,                  veggieapi.com
+interest = restaurant    =&gt;   places.com?type=veg
+restaurant = vegetarian       thefork?type=veggie
+</pre>
+
+</section>
+<section id="slide-orgheadline12">
+<h3 id="orgheadline12"><span class="section-number-3">3.2</span> Primary service association</h3>
+<p>
+Each enum's leaf \(L\) has a set \(O_L\) of operations associated with it. Each 
+operation describes a request template to a service \(s\). E.g:
+</p>
+
+<div>
+\begin{equation}
+O_{\textrm{restaurant.vegetarian}}= \{ o_{\textrm{thefork?type=veggie}}, o_{\textrm{veggieapi}}, \ldots \}
+\end{equation}
+
+</div>
+
+<p>
+All the possible operations in the system belong to the service repository \(O\):
+</p>
+
+<div>
+\begin{equation}
+O = O_{L1} \cup O_{L2} \cup \ldots O_{Ln}
+\end{equation}
+
+</div>
+
+</section>
+<section id="slide-orgheadline13">
+<h3 id="orgheadline13"><span class="section-number-3">3.3</span> Primary services data mashup</h3>
+<ul>
+<li>Each service has its own representation of data which should be made
+homogeneous before being sent to the client</li>
+
+<li>Each response field is mapped to a <b>term</b> that allows to individuate
+semantically similar items.</li>
+
+<li>Reconciliation and duplicate removal is used to remove duplicate items.</li>
+
+</ul>
+
+</section>
+<section id="slide-orgheadline14">
+<h3 id="orgheadline14"><span class="section-number-3">3.4</span> Service selection</h3>
+<p>
+The mapping is done by categorizing leafs parents as:
+</p>
+
+<ul>
+<li><b>ranking</b>: leafs value in \(t_u\) will influence the order of services in the result (e.g., <code>position</code>)</li>
+
+<li><b>filter</b>: if a leaf is present in \(t_u\), it excludes services from all the siblings (e.g, if
+<code>vegetarian : restaurant</code> is present, it excludes all other restaurant types).</li>
+
+</ul>
+
+</section>
+<section id="slide-orgheadline15">
+<h3 id="orgheadline15"><span class="section-number-3">3.5</span> Support services</h3>
+<p>
+They provide the user with <b>additional useful information</b>
+</p>
+
+<pre class="example">
+CONTEXT                       SERVICES
+time = evening,               maps.google.com 
+interest = restaurant    =&gt;   restaurantreviews.com
+restaurant = vegetarian       uber.com
+</pre>
+
+<p>
+Can be accessed either via <b>deep-linking</b> or <b>web-linking</b>.
+</p>
+
+</section>
+<section id="slide-orgheadline16">
+<h3 id="orgheadline16"><span class="section-number-3">3.6</span> Mashup schema</h3>
+<ul>
+<li>Describes how data should be visualized on the mobile device, for both <b>list</b>
+  and <b>detail</b> views.</li>
+
+<li>It is downloaded at login and guides the view creation once results are
+received.</li>
+
+<li><p>
+Example:
+</p>
+
+<pre class="example">
+CONTEXT                       MASHUP (DETAILS)
+...                           name: text
+interest = restaurant    =&gt;   address: text
+...                           (long, lat): map
+</pre></li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-orgheadline24">
+<h2 id="orgheadline24"><span class="section-number-2">4</span> Client and Server implementation</h2>
+<div class="outline-text-2" id="text-4">
+</div></section>
+<section id="slide-orgheadline18">
+<h3 id="orgheadline18"><span class="section-number-3">4.1</span> Requirements</h3>
+<ul>
+<li><b>Minimize bandwidth usage</b>: ask only for what you need</li>
+
+<li><b>Custom response types</b>: different context may need different types of data</li>
+
+<li><b>Native app feeling</b>: native app still better performance-wise and battery-wise.</li>
+
+</ul>
+
+</section>
+<section id="slide-orgheadline19">
+<h3 id="orgheadline19"><span class="section-number-3">4.2</span> </h3>
+
+<div class="figure">
+<p><img src="./images/jsatt.jpg" alt="jsatt.jpg" /> 
+</p>
+</div>
+
+</section>
+<section id="slide-orgheadline20">
+<h3 id="orgheadline20"><span class="section-number-3">4.3</span> GraphQL</h3>
+<ul>
+<li>Data-fetching API that returns JSON</li>
+<li>Query defines a data shape
+<ul>
+<li>easy to add field leaving existing clients unaffected</li>
+<li>optimal bandwidth usage</li>
+
+</ul></li>
+<li>It can be hierarchical: it naturally follows relationships between objects</li>
+
+</ul>
+
+</section>
+<section id="slide-orgheadline21">
+<h3 id="orgheadline21"><span class="section-number-3">4.4</span> GraphQL example</h3>
+<div class="org-src-container">
+
+<pre  class="src src-js">executeQuery<span style="color: #707183;">(</span>id: <span style="color: #008000;">"56975a1bd5704e0d0d815869"</span>, t_u<span style="color: #707183;">)</span> <span style="color: #707183;">{</span> shape <span style="color: #707183;">}</span>
+</pre>
+</div>
+
+<p>
+where <code>t_u</code> is a json-like representation of \(t_u\), while 
+<b>shape</b> describes the data set needed:
+</p>
+
+
+<div class="org-src-container">
+
+<pre  class="src src-js">primaryResults <span style="color: #707183;">{</span>
+    edges <span style="color: #7388D6;">{</span>
+        node <span style="color: #909183;">{</span>
+            title,
+            address,
+            telephone,
+            website
+        <span style="color: #909183;">}</span>
+    <span style="color: #7388D6;">}</span>
+<span style="color: #707183;">}</span>
+</pre>
+</div>
+
+</section>
+<section id="slide-orgheadline22">
+<h3 id="orgheadline22"><span class="section-number-3">4.5</span> React and React Native</h3>
+<ul>
+<li>React abstracts away the DOM, giving a simpler programming model and better performance</li>
+
+<li>It implements one-way reactive data flow which reduces boilerplate and is easier to reason about than traditional data binding</li>
+
+</ul>
+
+</section>
+<section id="slide-orgheadline23">
+<h3 id="orgheadline23"><span class="section-number-3">4.6</span> React Native / Example</h3>
+<div class="org-src-container">
+
+<pre  class="src src-js"><span style="color: #0000FF;">class</span> App <span style="color: #0000FF;">extends</span> Component <span style="color: #707183;">{</span>
+  render<span style="color: #7388D6;">()</span> <span style="color: #7388D6;">{</span>
+    <span style="color: #0000FF;">return</span> <span style="color: #909183;">(</span>
+      &lt;TabBarIOS&gt;
+        &lt;TabBarIOS.Item title=<span style="color: #008000;">"React Native"</span> selected=<span style="color: #709870;">{</span><span style="color: #D0372D;">true</span><span style="color: #709870;">}</span>&gt;
+          &lt;NavigatorIOS initialRoute=<span style="color: #709870;">{</span><span style="color: #907373;">{</span> title: <span style="color: #008000;">'React Native'</span> <span style="color: #907373;">}</span><span style="color: #709870;">}</span> /&gt;
+        &lt;/TabBarIOS.Item&gt;
+      &lt;/TabBarIOS&gt;
+    <span style="color: #909183;">)</span>;
+  <span style="color: #7388D6;">}</span>
+<span style="color: #707183;">}</span>
+</pre>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-orgheadline25">
+<h2 id="orgheadline25"><span class="section-number-2">5</span> Live Demo</h2>
+
+</section>
+</section>
+<section>
+<section id="slide-orgheadline28">
+<h2 id="orgheadline28"><span class="section-number-2">6</span> Performance evaluation</h2>
+<div class="outline-text-2" id="text-6">
+</div></section>
+<section id="slide-orgheadline26">
+<h3 id="orgheadline26"><span class="section-number-3">6.1</span> Time breakout</h3>
+<div class="org-center">
+<p>
+<a href="./images/component_time.pdf">./images/component_time.pdf</a>
+</p>
+</div>
+
+</section>
+<section id="slide-orgheadline27">
+<h3 id="orgheadline27"><span class="section-number-3">6.2</span> Scaling</h3>
+<div class="org-center">
+<p>
+<a href="./images/exponential_analysis.pdf">./images/exponential_analysis.pdf</a>
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-orgheadline30">
+<h2 id="orgheadline30"><span class="section-number-2">7</span> Conclusions</h2>
+<div class="outline-text-2" id="text-7">
+</div></section>
+<section id="slide-orgheadline29">
+<h3 id="orgheadline29"><span class="section-number-3">7.1</span> What still needs to be done</h3>
+<ul>
+<li>Better formalization of the query represented by the context</li>
+
+<li>Extension to services with a SOAP interface</li>
+
+</ul>
+
+
+</section>
+</section>
+<section>
+<section id="slide-orgheadline32">
+<h2 id="orgheadline32"><span class="section-number-2">8</span> Detailed description</h2>
+<div class="outline-text-2" id="text-8">
+</div></section>
+<section id="slide-orgheadline31">
+<h3 id="orgheadline31"><span class="section-number-3">8.1</span> Administrator and domain expert roles</h3>
+<div class="org-center">
+
+<div class="figure">
+<p><img src="images/designtime.png" alt="designtime.png" />
+</p>
+</div>
+</div>
+</div>
+</div>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: false,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }]
+});
+</script>
+</body>
+</html>

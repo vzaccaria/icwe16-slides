@@ -1,4 +1,4 @@
-% Created 2016-10-14 Fri 19:28
+% Created 2016-10-23 Sun 22:46
 \documentclass[smaller]{beamer}
 
 
@@ -266,7 +266,7 @@ interest = restaurant    =>   address: text
 \end{frame}
 
 \begin{frame}[label={sec:orgheadline19}]{}
-\includegraphics{./images/jsatt.jpg} 
+\includegraphics[width=.9\linewidth]{./images/jsatt.jpg} 
 \end{frame}
 
 \begin{frame}[label={sec:orgheadline20}]{GraphQL}
@@ -282,7 +282,7 @@ interest = restaurant    =>   address: text
 \end{frame}
 
 \begin{frame}[fragile,label={sec:orgheadline21}]{GraphQL example}
- \begin{minted}[obeytabs=true,baselinestretch=0.95]{js}
+ \begin{minted}[obeytabs=true,baselinestretch=0.95,frame=lines,linenos=true]{js}
 executeQuery(id: "56975a1bd5704e0d0d815869", t_u) { shape }
 \end{minted}
 
@@ -290,7 +290,7 @@ where \texttt{t\_u} is a json-like representation of \(t_u\), while
 \alert{shape} describes the data set needed:
 
 
-\begin{minted}[obeytabs=true,baselinestretch=0.95]{js}
+\begin{minted}[obeytabs=true,baselinestretch=0.95,frame=lines,linenos=true]{js}
 primaryResults {
     edges {
         node {
@@ -313,7 +313,7 @@ primaryResults {
 \end{frame}
 
 \begin{frame}[fragile,label={sec:orgheadline23}]{React Native / Example}
- \begin{minted}[obeytabs=true,baselinestretch=0.95]{js}
+ \begin{minted}[obeytabs=true,baselinestretch=0.95,frame=lines,linenos=true]{js}
 class App extends Component {
   render() {
     return (
@@ -335,13 +335,13 @@ class App extends Component {
 \label{sec:orgheadline28}
 \begin{frame}[label={sec:orgheadline26}]{Time breakout}
 \begin{center}
-\includegraphics{./images/component_time.pdf}
+\includegraphics[width=.9\linewidth]{./images/component_time.pdf}
 \end{center}
 \end{frame}
 
 \begin{frame}[label={sec:orgheadline27}]{Scaling}
 \begin{center}
-\includegraphics{./images/exponential_analysis.pdf}
+\includegraphics[width=.9\linewidth]{./images/exponential_analysis.pdf}
 \end{center}
 \end{frame}
 
@@ -360,7 +360,7 @@ class App extends Component {
 \label{sec:orgheadline32}
 \begin{frame}[label={sec:orgheadline31}]{Administrator and domain expert roles}
 \begin{center}
-\includegraphics{images/designtime.png}
+\includegraphics[width=.9\linewidth]{images/designtime.png}
 \end{center}
 \end{frame}
 \end{document}
